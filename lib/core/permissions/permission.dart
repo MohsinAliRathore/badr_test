@@ -6,7 +6,7 @@ class PermissionSet {
     final map = <String, Set<String>>{};
     json.forEach((resource, actions) {
       if (actions is List) {
-        map[resource] = actions.map((e) => e.toString()).toSet();
+        map[resource.toString()] = actions.map((e) => e.toString()).toSet();
       }
     });
     return PermissionSet(map);

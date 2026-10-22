@@ -7,8 +7,10 @@ SessionProfile mapMeResponse(Map<String, dynamic> json) {
   final permissionsJson = json['permissions'];
 
   late final PermissionSet permissions;
-  if (permissionsJson is Map<String, dynamic>) {
-    permissions = PermissionSet.fromJson(permissionsJson);
+  if (permissionsJson is Map) {
+    permissions = PermissionSet.fromJson(
+      Map<String, dynamic>.from(permissionsJson),
+    );
   } else if (permissionsJson is List) {
     permissions = PermissionSet.fromGraphqlList(permissionsJson);
   } else {

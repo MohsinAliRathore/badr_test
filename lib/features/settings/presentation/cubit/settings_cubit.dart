@@ -68,9 +68,13 @@ class SettingsCubit extends Cubit<SettingsState> {
 
   Future<void> cycleTheme() async {
     final next = switch (state.themeMode) {
-      ThemeMode.system => ThemeMode.light,
       ThemeMode.light => ThemeMode.dark,
-      ThemeMode.dark => ThemeMode.system,
+      ThemeMode.dark => ThemeMode.light,
+      ThemeMode.system =>
+        WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+                Brightness.dark
+            ? ThemeMode.light
+            : ThemeMode.dark,
     };
     await setThemeMode(next);
   }

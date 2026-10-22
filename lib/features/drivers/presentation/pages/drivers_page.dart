@@ -97,7 +97,9 @@ class DriversPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')),
+                  const SizedBox(height: 12),
                   TextField(controller: phone, decoration: const InputDecoration(labelText: 'Phone (+974…)')),
+                  const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     initialValue: cityId,
                     items: state.cities
@@ -106,9 +108,13 @@ class DriversPage extends StatelessWidget {
                     onChanged: (v) => setState(() => cityId = v ?? cityId),
                     decoration: const InputDecoration(labelText: 'City'),
                   ),
+                  const SizedBox(height: 12),
                   TextField(controller: make, decoration: const InputDecoration(labelText: 'Make')),
+                  const SizedBox(height: 12),
                   TextField(controller: model, decoration: const InputDecoration(labelText: 'Model')),
+                  const SizedBox(height: 12),
                   TextField(controller: plate, decoration: const InputDecoration(labelText: 'Plate')),
+                  const SizedBox(height: 12),
                   TextField(controller: color, decoration: const InputDecoration(labelText: 'Color')),
                 ],
               ),
@@ -151,6 +157,7 @@ class DriversPage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')),
+            const SizedBox(height: 12),
             TextField(controller: phone, decoration: const InputDecoration(labelText: 'Phone')),
           ],
         ),

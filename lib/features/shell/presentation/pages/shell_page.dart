@@ -195,6 +195,9 @@ class ShellPage extends StatelessWidget {
                     ? Row(
                         children: [
                           _Rail(
+                            key: ValueKey(
+                              '${profile.role}-${destinations.map((d) => d.name).join(',')}',
+                            ),
                             destinations: destinations,
                             selected: selected,
                             profileName: profile.name,
@@ -231,7 +234,11 @@ class ShellPage extends StatelessWidget {
                           ),
                           if (destinations.isNotEmpty)
                             NavigationBar(
-                              selectedIndex: selected.clamp(0, destinations.length - 1),
+                              key: ValueKey(
+                                '${profile.role}-${destinations.map((d) => d.name).join(',')}',
+                              ),
+                              selectedIndex:
+                                  selected.clamp(0, destinations.length - 1),
                               onDestinationSelected: (i) {
                                 if (i < destinations.length) {
                                   context.go(destinations[i].path);
@@ -274,6 +281,7 @@ class ShellPage extends StatelessWidget {
 
 class _Rail extends StatelessWidget {
   const _Rail({
+    super.key,
     required this.destinations,
     required this.selected,
     required this.profileName,

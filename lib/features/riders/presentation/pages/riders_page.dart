@@ -91,10 +91,14 @@ class RidersPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')),
+              const SizedBox(height: 12),
               TextField(controller: phone, decoration: const InputDecoration(labelText: 'Phone')),
+              const SizedBox(height: 12),
               TextField(controller: email, decoration: const InputDecoration(labelText: 'Email')),
+              const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: cityId,
+                decoration: const InputDecoration(labelText: 'City'),
                 items: state.cities
                     .map((c) => DropdownMenuItem(value: c.id, child: Text(c.name)))
                     .toList(),
@@ -135,7 +139,9 @@ class RidersPage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(controller: name, decoration: const InputDecoration(labelText: 'Name')),
+            const SizedBox(height: 12),
             TextField(controller: phone, decoration: const InputDecoration(labelText: 'Phone')),
+            const SizedBox(height: 12),
             TextField(controller: email, decoration: const InputDecoration(labelText: 'Email')),
           ],
         ),
