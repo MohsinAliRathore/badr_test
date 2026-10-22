@@ -49,10 +49,9 @@ Trip mapTripJson(Map<String, dynamic> json) {
   );
 }
 
-/// Maps a compact SSE trip payload into a partial update shape.
 Trip? mapTripEventPayload(Map<String, dynamic> json) {
   if (json['id'] == null && json['tripId'] == null) return null;
-  // Prefer full nested GraphQL-shaped payloads; otherwise build a stub.
+
   if (json['rider'] is Map<String, dynamic>) {
     return mapTripJson(json);
   }
@@ -98,7 +97,7 @@ DateTime? _dt(Object? v) =>
 String _normalizeStatus(String? raw) {
   if (raw == null || raw.isEmpty) return '';
   final s = raw.trim();
-  // GraphQL: IN_PROGRESS / REST & SSE: in_progress or inProgress
+
   final withUnderscores = s
       .replaceAllMapped(
         RegExp(r'([a-z0-9])([A-Z])'),

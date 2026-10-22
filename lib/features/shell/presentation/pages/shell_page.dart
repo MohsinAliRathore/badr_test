@@ -38,6 +38,7 @@ class ShellPage extends StatelessWidget {
 
         final width = MediaQuery.sizeOf(context).width;
         final useRail = width >= 900;
+        final extendedRail = width >= 1100;
 
         return Scaffold(
           body: Column(
@@ -199,8 +200,16 @@ class ShellPage extends StatelessWidget {
                             profileName: profile.name,
                             role: profile.role,
                             city: profile.cityLabel,
+                            extended: extendedRail,
                           ),
-                          const VerticalDivider(width: 1),
+                          VerticalDivider(
+                            width: 24,
+                            thickness: 1,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .outlineVariant
+                                .withValues(alpha: 0.45),
+                          ),
                           Expanded(
                             child: destinations.isEmpty
                                 ? NoAccessView(message: s.noAccessBody)
@@ -270,6 +279,7 @@ class _Rail extends StatelessWidget {
     required this.profileName,
     required this.role,
     required this.city,
+    required this.extended,
   });
 
   final List<AppDestination> destinations;
@@ -277,93 +287,227 @@ class _Rail extends StatelessWidget {
   final String profileName;
   final String role;
   final String city;
+  final bool extended;
+
+  static const double _extendedWidth = 260;
+  static const double _compactWidth = 104;
 
   @override
   Widget build(BuildContext context) {
     final s = AppStrings.of(context);
-    return NavigationRail(
-      selectedIndex: destinations.isEmpty ? 0 : selected,
-      onDestinationSelected: (i) {
-        if (i < destinations.length) context.go(destinations[i].path);
-      },
-      labelType: NavigationRailLabelType.all,
-      leading: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        child: Column(
-          children: [
-            Text(
-              'badrgo',
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-            ),
-            Text('Ops', style: Theme.of(context).textTheme.labelSmall),
-          ],
-        ),
-      ),
-      trailing: Expanded(
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                  child: Text(
-                    profileName.isNotEmpty
-                        ? profileName.characters.first.toUpperCase()
-                        : '?',
-                  ),
-                ),
-                const SizedBox(height: 6),
-                SizedBox(
-                  width: 88,
-                  child: Text(
-                    profileName,
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelSmall,
-                  ),
-                ),
-                Text(
-                  role,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
+    final theme = Theme.of(context);
+    final railWidth = extended ? _extendedWidth : _compactWidth;
+    return SizedBox(
+      width: railWidth,
+      child: NavigationRail(
+        extended: extended,
+        minWidth: _compactWidth,
+        minExtendedWidth: _extendedWidth,
+        selectedIndex: destinations.isEmpty ? 0 : selected,
+        onDestinationSelected: (i) {
+          if (i < destinations.length) context.go(destinations[i].path);
+        },
+        labelType: extended ? null : NavigationRailLabelType.all,
+        leading: Padding(
+          padding: EdgeInsets.fromLTRB(
+            extended ? 20 : 8,
+            24,
+            extended ? 20 : 8,
+            16,
+          ),
+          child: extended
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'badrgo',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.primary,
                       ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Ops Console',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'badrgo',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w800,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text('Ops', style: theme.textTheme.labelSmall),
+                  ],
                 ),
-                Text(city, style: Theme.of(context).textTheme.labelSmall),
-                const SizedBox(height: 4),
-                IconButton(
-                  tooltip: s.language,
-                  onPressed: () => context.read<SettingsCubit>().toggleLocale(),
-                  icon: const Icon(Icons.translate),
+        ),
+        trailing: Expanded(
+          child: Align(
+            alignment: extended ? Alignment.bottomLeft : Alignment.bottomCenter,
+            child: SizedBox(
+              width: railWidth,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  extended ? 16 : 8,
+                  0,
+                  extended ? 16 : 8,
+                  20,
                 ),
-                IconButton(
-                  tooltip: s.theme,
-                  onPressed: () => context.read<SettingsCubit>().cycleTheme(),
-                  icon: const Icon(Icons.brightness_6_outlined),
-                ),
-                IconButton(
-                  tooltip: s.signOut,
-                  onPressed: () =>
-                      context.read<AuthBloc>().add(const AuthSignOutRequested()),
-                  icon: const Icon(Icons.logout),
-                ),
-              ],
+                child: extended
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 20,
+                                child: Text(
+                                  profileName.isNotEmpty
+                                      ? profileName.characters.first
+                                          .toUpperCase()
+                                      : '?',
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      profileName,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style:
+                                          theme.textTheme.titleSmall?.copyWith(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      '$role · $city',
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style:
+                                          theme.textTheme.bodySmall?.copyWith(
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              IconButton.filledTonal(
+                                tooltip: s.language,
+                                onPressed: () => context
+                                    .read<SettingsCubit>()
+                                    .toggleLocale(),
+                                icon: const Icon(Icons.translate),
+                              ),
+                              const SizedBox(width: 8),
+                              IconButton.filledTonal(
+                                tooltip: s.theme,
+                                onPressed: () =>
+                                    context.read<SettingsCubit>().cycleTheme(),
+                                icon: const Icon(Icons.brightness_6_outlined),
+                              ),
+                              const Spacer(),
+                              IconButton.filledTonal(
+                                tooltip: s.signOut,
+                                onPressed: () => context
+                                    .read<AuthBloc>()
+                                    .add(const AuthSignOutRequested()),
+                                icon: const Icon(Icons.logout),
+                              ),
+                            ],
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            child: Text(
+                              profileName.isNotEmpty
+                                  ? profileName.characters.first.toUpperCase()
+                                  : '?',
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: 88,
+                            child: Text(
+                              profileName,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelSmall,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            role,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(city, style: theme.textTheme.labelSmall),
+                          const SizedBox(height: 12),
+                          IconButton(
+                            tooltip: s.language,
+                            onPressed: () =>
+                                context.read<SettingsCubit>().toggleLocale(),
+                            icon: const Icon(Icons.translate),
+                          ),
+                          IconButton(
+                            tooltip: s.theme,
+                            onPressed: () =>
+                                context.read<SettingsCubit>().cycleTheme(),
+                            icon: const Icon(Icons.brightness_6_outlined),
+                          ),
+                          IconButton(
+                            tooltip: s.signOut,
+                            onPressed: () => context
+                                .read<AuthBloc>()
+                                .add(const AuthSignOutRequested()),
+                            icon: const Icon(Icons.logout),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ),
         ),
+        destinations: [
+          for (final d in destinations)
+            NavigationRailDestination(
+              icon: Icon(_icon(d), size: extended ? 24 : 22),
+              label: Text(
+                s.labelFor(d.labelKey),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              padding: EdgeInsets.symmetric(vertical: extended ? 6 : 4),
+            ),
+        ],
       ),
-      destinations: [
-        for (final d in destinations)
-          NavigationRailDestination(
-            icon: Icon(_icon(d)),
-            label: Text(s.labelFor(d.labelKey)),
-          ),
-      ],
     );
   }
 
@@ -397,7 +541,7 @@ class _CompactHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
               Text(
@@ -407,7 +551,7 @@ class _CompactHeader extends StatelessWidget {
                       color: Theme.of(context).colorScheme.primary,
                     ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   '$profileName · $role · $city',
@@ -415,6 +559,7 @@ class _CompactHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
               IconButton(
                 onPressed: () => context.read<SettingsCubit>().toggleLocale(),
                 icon: const Icon(Icons.translate),

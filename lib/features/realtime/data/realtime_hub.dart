@@ -3,7 +3,6 @@ import 'dart:async';
 import '../../../core/network/sse_client.dart';
 import '../../../core/network/ws_client.dart';
 
-/// Fan-out hub so feature blocs can listen without owning transport lifecycle.
 class RealtimeHub {
   RealtimeHub({
     required SseClient sse,

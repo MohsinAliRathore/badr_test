@@ -58,7 +58,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     DashboardSseKpiReceived event,
     Emitter<DashboardState> emit,
   ) {
-    // SSE kpi stream is last_24h style; only apply when viewing that range.
+
     final incoming = mapKpiJson(event.data);
     if (state.range == KpiRange.last24h) {
       emit(state.copyWith(snapshot: incoming, live: true, clearError: true));

@@ -1,5 +1,4 @@
-// GENERATED from openapi.json — source: ./openapi.json
-// Regenerate mentally after OpenAPI changes; keep field names aligned with the sandbox.
+
 
 class ApiMoney {
   const ApiMoney({required this.amount, required this.currency});

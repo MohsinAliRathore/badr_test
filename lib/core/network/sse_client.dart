@@ -10,12 +10,6 @@ import '../config/env.dart';
 import '../errors/app_exception.dart';
 import 'auth_session.dart';
 
-/// Server-Sent Events client for Flutter web using `package:web` EventSource.
-///
-/// Chosen because browsers cannot set Authorization headers on EventSource,
-/// so we pass `?token=` as required by the API. EventSource also resumes with
-/// the `Last-Event-ID` header on native reconnect; we additionally persist the
-/// last id and pass `lastEventId` on fresh connects (B4).
 class SseClient {
   SseClient({
     required AuthSession session,

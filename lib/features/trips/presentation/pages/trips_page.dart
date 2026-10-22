@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/async_body.dart';
+import '../../../../core/widgets/page_chrome.dart';
 import '../../domain/entities/trip.dart';
 import '../bloc/trips_list_bloc.dart';
 
@@ -63,7 +64,8 @@ class _TripsPageState extends State<TripsPage> {
     );
     if (picked != null) {
       setState(
-        () => _to = DateTime.utc(picked.year, picked.month, picked.day, 23, 59, 59),
+        () => _to =
+            DateTime.utc(picked.year, picked.month, picked.day, 23, 59, 59),
       );
       _applyFilters();
     }
@@ -73,35 +75,45 @@ class _TripsPageState extends State<TripsPage> {
   Widget build(BuildContext context) {
     final s = AppStrings.of(context);
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Text(s.navTrips, style: Theme.of(context).textTheme.headlineSmall),
-              SizedBox(
-                width: 220,
-                child: TextField(
-                  controller: _search,
-                  decoration: InputDecoration(
-                    hintText: s.search,
-                    prefixIcon: const Icon(Icons.search),
-                    isDense: true,
-                  ),
-                  onSubmitted: (_) => _applyFilters(),
+        PageHeader(
+          title: s.navTrips,
+          subtitle: 'Filter and monitor live trip activity',
+          actions: [
+            IconButton.filledTonal(
+              tooltip: 'Apply filters',
+              onPressed: _applyFilters,
+              icon: const Icon(Icons.filter_alt),
+            ),
+          ],
+        ),
+        FilterBar(
+          children: [
+            SizedBox(
+              width: 240,
+              child: TextField(
+                controller: _search,
+                decoration: InputDecoration(
+                  hintText: s.search,
+                  prefixIcon: const Icon(Icons.search),
                 ),
+                onSubmitted: (_) => _applyFilters(),
               ),
-              DropdownButton<String?>(
-                value: _status,
-                hint: const Text('Status'),
+            ),
+            SizedBox(
+              width: 180,
+              child: DropdownButtonFormField<String?>(
+                initialValue: _status,
+                decoration: const InputDecoration(labelText: 'Status'),
                 items: const [
                   DropdownMenuItem(value: null, child: Text('All statuses')),
                   DropdownMenuItem(value: 'requested', child: Text('Requested')),
                   DropdownMenuItem(value: 'assigned', child: Text('Assigned')),
-                  DropdownMenuItem(value: 'in_progress', child: Text('In progress')),
+                  DropdownMenuItem(
+                    value: 'in_progress',
+                    child: Text('In progress'),
+                  ),
                   DropdownMenuItem(value: 'completed', child: Text('Completed')),
                   DropdownMenuItem(value: 'cancelled', child: Text('Cancelled')),
                 ],
@@ -110,42 +122,37 @@ class _TripsPageState extends State<TripsPage> {
                   _applyFilters();
                 },
               ),
-              OutlinedButton.icon(
-                onPressed: _pickFrom,
-                icon: const Icon(Icons.calendar_today, size: 16),
-                label: Text(
-                  _from == null
-                      ? s.fromDate
-                      : DateFormat.yMMMd().format(_from!.toLocal()),
-                ),
+            ),
+            OutlinedButton.icon(
+              onPressed: _pickFrom,
+              icon: const Icon(Icons.calendar_today, size: 16),
+              label: Text(
+                _from == null
+                    ? s.fromDate
+                    : DateFormat.yMMMd().format(_from!.toLocal()),
               ),
-              OutlinedButton.icon(
-                onPressed: _pickTo,
-                icon: const Icon(Icons.event, size: 16),
-                label: Text(
-                  _to == null
-                      ? s.toDate
-                      : DateFormat.yMMMd().format(_to!.toLocal()),
-                ),
+            ),
+            OutlinedButton.icon(
+              onPressed: _pickTo,
+              icon: const Icon(Icons.event, size: 16),
+              label: Text(
+                _to == null
+                    ? s.toDate
+                    : DateFormat.yMMMd().format(_to!.toLocal()),
               ),
-              if (_from != null || _to != null)
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _from = null;
-                      _to = null;
-                    });
-                    _applyFilters();
-                  },
-                  child: const Text('Clear dates'),
-                ),
-              IconButton(
-                tooltip: 'Apply',
-                onPressed: _applyFilters,
-                icon: const Icon(Icons.filter_alt),
+            ),
+            if (_from != null || _to != null)
+              TextButton(
+                onPressed: () {
+                  setState(() {
+                    _from = null;
+                    _to = null;
+                  });
+                  _applyFilters();
+                },
+                child: const Text('Clear dates'),
               ),
-            ],
-          ),
+          ],
         ),
         Expanded(
           child: BlocBuilder<TripsListBloc, TripsListState>(
@@ -158,17 +165,19 @@ class _TripsPageState extends State<TripsPage> {
                 onRetry: () => context
                     .read<TripsListBloc>()
                     .add(const TripsRefreshRequested()),
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ListView.separated(
+                  padding: PageChrome.listInsets,
                   itemCount: state.trips.length + (state.hasNextPage ? 1 : 0),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: PageChrome.itemGap),
                   itemBuilder: (context, index) {
                     if (index >= state.trips.length) {
                       return Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Center(
                           child: state.loadingMore
                               ? const CircularProgressIndicator()
-                              : TextButton(
+                              : FilledButton.tonal(
                                   onPressed: () => context
                                       .read<TripsListBloc>()
                                       .add(const TripsLoadMore()),
@@ -196,53 +205,64 @@ class _TripsPageState extends State<TripsPage> {
                                 style: const TextStyle(fontFamily: 'monospace'),
                               ),
                             ),
-                            if (isNew)
+                            if (isNew) ...[
+                              const SizedBox(width: 8),
                               const Chip(
                                 label: Text('NEW'),
                                 visualDensity: VisualDensity.compact,
                               ),
-                            if (isChanged && !isNew)
+                            ],
+                            if (isChanged && !isNew) ...[
+                              const SizedBox(width: 8),
                               const Chip(
                                 label: Text('UPDATED'),
                                 visualDensity: VisualDensity.compact,
                               ),
+                            ],
                           ],
                         ),
-                        subtitle: Text(
-                          '${trip.rider.name} · ${trip.pickup.address} → ${trip.dropoff.address}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            '${trip.rider.name} · ${trip.pickup.address} → ${trip.dropoff.address}',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        trailing: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppTheme.statusColor(trip.status)
-                                    .withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                trip.status,
-                                style: TextStyle(
-                                  color: AppTheme.statusColor(trip.status),
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 12,
+                        trailing: Padding(
+                          padding: const EdgeInsets.only(left: 12),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.statusColor(trip.status)
+                                      .withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  trip.status,
+                                  style: TextStyle(
+                                    color: AppTheme.statusColor(trip.status),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              DateFormat.MMMd().add_Hm().format(
-                                    trip.requestedAt.toLocal(),
-                                  ),
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
+                              const SizedBox(height: 6),
+                              Text(
+                                DateFormat.MMMd().add_Hm().format(
+                                      trip.requestedAt.toLocal(),
+                                    ),
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     );

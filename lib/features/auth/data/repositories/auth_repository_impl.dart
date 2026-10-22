@@ -44,7 +44,7 @@ class AuthRepositoryImpl implements AuthRepository {
       _session.setToken(token);
       return fetchMe();
     } on AppException {
-      // Banned users arrive as 403 with a useful message.
+
       rethrow;
     }
   }
@@ -56,7 +56,7 @@ class AuthRepositoryImpl implements AuthRepository {
         await _rest.post<dynamic>('/api/auth/sign-out', data: {});
       }
     } on AppException {
-      // Always clear local session even if revoke fails.
+
     } finally {
       await _store.clear();
       _session.setToken(null);

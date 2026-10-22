@@ -81,7 +81,7 @@ class AlertsBloc extends Bloc<AlertsEvent, AlertsState> {
       );
       return;
     }
-    // acknowledged
+
     final next = state.alerts.map((a) {
       if (a.id != alert.id) return a;
       return alert;

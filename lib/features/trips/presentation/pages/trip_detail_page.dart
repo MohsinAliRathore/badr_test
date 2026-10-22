@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/async_body.dart';
+import '../../../../core/widgets/page_chrome.dart';
 import '../../../../di/injection.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../domain/entities/trip.dart';
@@ -87,26 +88,29 @@ class _TripBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: PageChrome.pageInsets,
       children: [
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextButton.icon(
               onPressed: () => context.go('/trips'),
               icon: const Icon(Icons.arrow_back),
               label: const Text('Trips'),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 16),
             Expanded(
               child: Text(
                 trip.id,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontFamily: 'monospace',
+                      fontWeight: FontWeight.w700,
                     ),
               ),
             ),
+            const SizedBox(width: 12),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: AppTheme.statusColor(trip.status).withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(8),
@@ -121,7 +125,7 @@ class _TripBody extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 20),
         Wrap(
           spacing: 12,
           runSpacing: 12,
@@ -150,7 +154,7 @@ class _TripBody extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 24),
         _section(
           context,
           'People',
@@ -206,14 +210,19 @@ class _TripBody extends StatelessWidget {
 
   Widget _section(BuildContext context, String title, List<Widget> children) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 8),
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            const SizedBox(height: 14),
             ...children,
           ],
         ),
@@ -223,12 +232,12 @@ class _TripBody extends StatelessWidget {
 
   Widget _kv(String k, String v) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
+            width: 128,
             child: Text(k, style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
           Expanded(child: Text(v)),

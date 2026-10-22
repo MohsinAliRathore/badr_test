@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// Optional live smoke test against the hosted sandbox.
-/// Skipped automatically when the API is unreachable.
 void main() {
   const base = String.fromEnvironment(
     'API_URL',
@@ -25,7 +23,7 @@ void main() {
       final signInRes = await signIn.close().timeout(const Duration(seconds: 10));
       final signInBody = await signInRes.transform(utf8.decoder).join();
       if (signInRes.statusCode >= 500) {
-        // ignore: avoid_print
+
         print('Sandbox unavailable (${signInRes.statusCode}); skipping');
         return;
       }
@@ -41,10 +39,10 @@ void main() {
       expect(me['permissions'], isA<Map>());
       expect(me['role'], isNotEmpty);
     } on SocketException {
-      // ignore: avoid_print
+
       print('No network; skipping live API smoke test');
     } on HttpException {
-      // ignore: avoid_print
+
       print('HTTP failure; skipping live API smoke test');
     } finally {
       client.close(force: true);

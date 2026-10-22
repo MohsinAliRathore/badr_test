@@ -91,7 +91,7 @@ class TripRepositoryImpl implements TripRepository {
       '/api/trips/$tripId/assign',
       data: {'driverId': driverId},
     );
-    // REST trip shape is flat; reload nested GraphQL detail for the UI.
+
     return getTrip(tripId);
   }
 

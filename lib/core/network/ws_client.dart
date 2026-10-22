@@ -9,7 +9,6 @@ import 'auth_session.dart';
 
 enum WsConnectionState { disconnected, connecting, connected, reconnecting }
 
-/// WebSocket client with exponential backoff reconnect and channel subscribe.
 class WsClient {
   WsClient({required AuthSession session}) : _session = session;
 
@@ -130,7 +129,7 @@ class WsClient {
       }
       _messages.add(frame);
     } catch (_) {
-      // ignore malformed frames
+
     }
   }
 

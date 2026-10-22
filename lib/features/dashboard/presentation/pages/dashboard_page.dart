@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../core/widgets/async_body.dart';
+import '../../../../core/widgets/page_chrome.dart';
 import '../../domain/entities/kpi_snapshot.dart';
 import '../bloc/dashboard_bloc.dart';
 
@@ -18,41 +19,38 @@ class DashboardPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Row(
-                children: [
-                  Text('Dashboard', style: Theme.of(context).textTheme.headlineSmall),
-                  const Spacer(),
-                  if (state.live)
-                    const Padding(
-                      padding: EdgeInsets.only(right: 12),
-                      child: Chip(
-                        avatar: Icon(Icons.bolt, size: 16),
-                        label: Text('Live'),
-                        visualDensity: VisualDensity.compact,
-                      ),
+            PageHeader(
+              title: 'Dashboard',
+              subtitle: 'Live operations overview',
+              actions: [
+                if (state.live)
+                  Chip(
+                    avatar: Icon(
+                      Icons.bolt,
+                      size: 16,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-                  SegmentedButton<KpiRange>(
-                    segments: [
-                      ButtonSegment(
-                        value: KpiRange.last24h,
-                        label: Text(KpiRange.last24h.label),
-                      ),
-                      ButtonSegment(
-                        value: KpiRange.last7d,
-                        label: Text(KpiRange.last7d.label),
-                      ),
-                    ],
-                    selected: {state.range},
-                    onSelectionChanged: (s) {
-                      context
-                          .read<DashboardBloc>()
-                          .add(DashboardRangeChanged(s.first));
-                    },
+                    label: const Text('Live'),
                   ),
-                ],
-              ),
+                SegmentedButton<KpiRange>(
+                  segments: [
+                    ButtonSegment(
+                      value: KpiRange.last24h,
+                      label: Text(KpiRange.last24h.label),
+                    ),
+                    ButtonSegment(
+                      value: KpiRange.last7d,
+                      label: Text(KpiRange.last7d.label),
+                    ),
+                  ],
+                  selected: {state.range},
+                  onSelectionChanged: (s) {
+                    context
+                        .read<DashboardBloc>()
+                        .add(DashboardRangeChanged(s.first));
+                  },
+                ),
+              ],
             ),
             Expanded(
               child: AsyncBody(
@@ -86,52 +84,70 @@ class _DashboardBody extends StatelessWidget {
         : snapshot.revenue.map((m) => m.formatted).join(' · ');
     final tiles = [
       _KpiTile('Active trips', '${snapshot.trips.active}', Icons.local_taxi),
-      _KpiTile('Completed', '${snapshot.trips.completed}', Icons.check_circle_outline),
+      _KpiTile(
+        'Completed',
+        '${snapshot.trips.completed}',
+        Icons.check_circle_outline,
+      ),
       _KpiTile(
         'Cancel rate',
         NumberFormat.percentPattern().format(snapshot.trips.cancellationRate),
         Icons.cancel_outlined,
       ),
       _KpiTile('Revenue', revenue, Icons.payments_outlined),
-      _KpiTile('Drivers available', '${snapshot.drivers.available}', Icons.person_outline),
+      _KpiTile(
+        'Drivers available',
+        '${snapshot.drivers.available}',
+        Icons.person_outline,
+      ),
       _KpiTile('Drivers on trip', '${snapshot.drivers.onTrip}', Icons.route),
-      _KpiTile('Open alerts', '${snapshot.openAlerts}', Icons.notification_important_outlined),
+      _KpiTile(
+        'Open alerts',
+        '${snapshot.openAlerts}',
+        Icons.notification_important_outlined,
+      ),
     ];
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: PageChrome.listInsets,
       children: [
         LayoutBuilder(
           builder: (context, constraints) {
             final width = constraints.maxWidth;
-            final cross = width > 1100
+            final cross = width > 1200
                 ? 4
-                : width > 700
+                : width > 800
                     ? 3
                     : 2;
             return GridView.count(
               crossAxisCount: cross,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 12,
-              crossAxisSpacing: 12,
-              childAspectRatio: 2.2,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 16,
+              childAspectRatio: width > 800 ? 2.4 : 2.1,
               children: tiles,
             );
           },
         ),
-        const SizedBox(height: 24),
-        Text('Trips over time', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 12),
+        const SizedBox(height: 28),
+        Text(
+          'Trips over time',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 14),
         SizedBox(
-          height: 260,
+          height: 280,
           child: Card(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12, 16, 16, 12),
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
               child: _SeriesChart(series: snapshot.series),
             ),
           ),
         ),
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -146,17 +162,18 @@ class _KpiTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor:
-                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-              child: Icon(icon, color: Theme.of(context).colorScheme.primary),
+              radius: 22,
+              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+              child: Icon(icon, color: theme.colorScheme.primary),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,17 +181,18 @@ class _KpiTile extends StatelessWidget {
                 children: [
                   Text(
                     label,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     value,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -205,17 +223,19 @@ class _SeriesChart extends StatelessWidget {
         gridData: const FlGridData(show: true, drawVerticalLine: false),
         titlesData: FlTitlesData(
           topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles:
+              const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
+              reservedSize: 28,
               interval: (series.length / 4).clamp(1, 6).toDouble(),
               getTitlesWidget: (value, meta) {
                 final i = value.round();
                 if (i < 0 || i >= series.length) return const SizedBox.shrink();
                 final d = series[i].bucket.toLocal();
                 return Padding(
-                  padding: const EdgeInsets.only(top: 6),
+                  padding: const EdgeInsets.only(top: 8),
                   child: Text(
                     DateFormat.Hm().format(d),
                     style: const TextStyle(fontSize: 10),
@@ -235,7 +255,10 @@ class _SeriesChart extends StatelessWidget {
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: 0.12),
             ),
           ),
         ],

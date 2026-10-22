@@ -108,7 +108,7 @@ class TripsListBloc extends Bloc<TripsListEvent, TripsListState> {
       return;
     }
 
-    // trip.updated
+
     final index = state.trips.indexWhere((t) => t.id == id);
     Trip? trip = mapped;
     trip ??= await _safeFetch(id);

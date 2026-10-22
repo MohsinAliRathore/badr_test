@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_body.dart';
+import '../../../../core/widgets/page_chrome.dart';
 import '../../../../generated/openapi_models.dart';
 import '../bloc/riders_bloc.dart';
 
@@ -22,21 +23,19 @@ class RidersPage extends StatelessWidget {
       },
       builder: (context, state) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Row(
-                children: [
-                  Text(s.navRiders, style: Theme.of(context).textTheme.headlineSmall),
-                  const Spacer(),
-                  if (state.canCreate)
-                    FilledButton.icon(
-                      onPressed: () => _create(context, state),
-                      icon: const Icon(Icons.add),
-                      label: Text(s.create),
-                    ),
-                ],
-              ),
+            PageHeader(
+              title: s.navRiders,
+              subtitle: 'Rider directory for your city',
+              actions: [
+                if (state.canCreate)
+                  FilledButton.icon(
+                    onPressed: () => _create(context, state),
+                    icon: const Icon(Icons.add),
+                    label: Text(s.create),
+                  ),
+              ],
             ),
             Expanded(
               child: AsyncBody(
@@ -46,17 +45,19 @@ class RidersPage extends StatelessWidget {
                 onRetry: () => context
                     .read<RidersBloc>()
                     .add(const RidersRefreshRequested()),
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SpacedList(
                   itemCount: state.riders.length,
                   itemBuilder: (context, i) {
                     final r = state.riders[i];
                     return Card(
                       child: ListTile(
                         title: Text(r.name),
-                        subtitle: Text(
-                          '${r.phone} · ${r.cityName ?? r.cityId}'
-                          '${r.email != null ? ' · ${r.email}' : ''}',
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            '${r.phone} · ${r.cityName ?? r.cityId}'
+                            '${r.email != null ? ' · ${r.email}' : ''}',
+                          ),
                         ),
                         trailing: state.canUpdate
                             ? IconButton(

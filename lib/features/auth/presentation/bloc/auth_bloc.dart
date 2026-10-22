@@ -61,7 +61,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthState.authenticated(profile));
     } on AppException catch (e) {
       if (e.isMaintenance) {
-        // Keep token; connectivity layer handles maintenance overlay.
+
         emit(state.copyWith(
           status: AuthStatus.authenticated,
           errorMessage: e.message,
@@ -120,16 +120,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     if (!state.isAuthenticated) return;
-    // Role change: refresh /api/me so shell adapts without full sign-out.
+
     try {
       final profile = await _authRepository.fetchMe();
       emit(AuthState.authenticated(profile));
-      // Restart realtime so deniedTopics / channels match the new role.
+
       _stopRealtime();
       _startRealtime();
     } on AppException catch (e) {
       if (e.isUnauthenticated || e.isForbidden) {
-        // Banned (or session revoked): sign out.
+
         add(const AuthUnauthorizedReceived());
       }
     }

@@ -1,5 +1,5 @@
-/// Typed GraphQL operation documents (B7).
-/// Aligned with https://sandbox.badrgo.com/graphql/schema.graphql
+
+
 class GqlOps {
   GqlOps._();
 

@@ -1,7 +1,5 @@
 import 'dart:async';
 
-/// Holds the current bearer token and broadcasts auth-loss (401) events
-/// so every transport can tear down without looping.
 class AuthSession {
   AuthSession({String? initialToken}) : _token = initialToken;
 
@@ -17,7 +15,7 @@ class AuthSession {
 
   Stream<void> get unauthorized => _unauthorizedController.stream;
 
-  /// Fired on 403 so the shell can refresh `/api/me` (role changes).
+
   Stream<void> get forbidden => _forbiddenController.stream;
 
   void setToken(String? token) {

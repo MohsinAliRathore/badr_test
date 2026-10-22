@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_body.dart';
+import '../../../../core/widgets/page_chrome.dart';
 import '../../../../generated/openapi_models.dart';
 import '../bloc/users_bloc.dart';
 
@@ -30,21 +31,19 @@ class UsersPage extends StatelessWidget {
       },
       builder: (context, state) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Row(
-                children: [
-                  Text(s.navUsers, style: Theme.of(context).textTheme.headlineSmall),
-                  const Spacer(),
-                  if (state.canCreate)
-                    FilledButton.icon(
-                      onPressed: () => _create(context),
-                      icon: const Icon(Icons.person_add),
-                      label: Text(s.create),
-                    ),
-                ],
-              ),
+            PageHeader(
+              title: s.navUsers,
+              subtitle: 'Create, re-role, and ban console users',
+              actions: [
+                if (state.canCreate)
+                  FilledButton.icon(
+                    onPressed: () => _create(context),
+                    icon: const Icon(Icons.person_add),
+                    label: Text(s.create),
+                  ),
+              ],
             ),
             Expanded(
               child: AsyncBody(
@@ -53,30 +52,32 @@ class UsersPage extends StatelessWidget {
                 isEmpty: state.users.isEmpty,
                 onRetry: () =>
                     context.read<UsersBloc>().add(const UsersRefreshRequested()),
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SpacedList(
                   itemCount: state.users.length,
                   itemBuilder: (context, i) {
                     final u = state.users[i];
                     return Card(
                       child: ListTile(
                         title: Text(u.name),
-                        subtitle: Text(
-                          '${u.email} · ${u.role}'
-                          '${u.cityId != null ? ' · ${u.cityId}' : ''}'
-                          '${u.banned ? ' · BANNED' : ''}',
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            '${u.email} · ${u.role}'
+                            '${u.cityId != null ? ' · ${u.cityId}' : ''}'
+                            '${u.banned ? ' · BANNED' : ''}',
+                          ),
                         ),
                         trailing: Wrap(
-                          spacing: 4,
+                          spacing: 8,
                           children: [
                             if (state.canSetRole)
-                              IconButton(
+                              IconButton.filledTonal(
                                 tooltip: 'Change role',
                                 onPressed: () => _editRole(context, u),
                                 icon: const Icon(Icons.manage_accounts),
                               ),
                             if (state.canBan)
-                              IconButton(
+                              IconButton.filledTonal(
                                 tooltip: u.banned ? s.unban : s.ban,
                                 onPressed: () => u.banned
                                     ? context

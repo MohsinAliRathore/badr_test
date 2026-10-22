@@ -84,7 +84,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       );
       emit(state.copyWith(selectedDetails: data['driver'] as Map<String, dynamic>?));
     } catch (_) {
-      // details are best-effort
+
     }
   }
 

@@ -43,7 +43,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     final driverId = state.driverId;
     if (driverId == null || event.body.trim().isEmpty) return;
     _repo.send(driverId: driverId, body: event.body.trim());
-    // Optimistic local echo for to_driver
+
     final optimistic = ApiDriverMessage(
       id: 'local-${DateTime.now().millisecondsSinceEpoch}',
       driverId: driverId,

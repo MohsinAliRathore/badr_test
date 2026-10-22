@@ -1,4 +1,4 @@
-/// Permission checks derived from `/api/me` — never from role names.
+
 class PermissionSet {
   const PermissionSet(this._map);
 
@@ -80,7 +80,6 @@ class PermissionSet {
   }
 }
 
-/// Maps routes / nav destinations to the permission required to see them.
 enum AppDestination {
   dashboard,
   trips,

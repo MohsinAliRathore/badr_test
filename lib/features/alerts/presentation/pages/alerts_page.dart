@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_body.dart';
+import '../../../../core/widgets/page_chrome.dart';
 import '../bloc/alerts_bloc.dart';
 
 class AlertsPage extends StatelessWidget {
@@ -11,23 +13,21 @@ class AlertsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = AppStrings.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: Row(
-            children: [
-              Text('Alerts', style: Theme.of(context).textTheme.headlineSmall),
-              const Spacer(),
-              IconButton(
-                onPressed: () => context
-                    .read<AlertsBloc>()
-                    .add(const AlertsRefreshRequested()),
-                icon: const Icon(Icons.refresh),
-              ),
-            ],
-          ),
+        PageHeader(
+          title: s.navAlerts,
+          subtitle: 'Open alerts for your city',
+          actions: [
+            IconButton.filledTonal(
+              onPressed: () => context
+                  .read<AlertsBloc>()
+                  .add(const AlertsRefreshRequested()),
+              icon: const Icon(Icons.refresh),
+            ),
+          ],
         ),
         Expanded(
           child: BlocBuilder<AlertsBloc, AlertsState>(
@@ -40,8 +40,7 @@ class AlertsPage extends StatelessWidget {
                 onRetry: () => context
                     .read<AlertsBloc>()
                     .add(const AlertsRefreshRequested()),
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SpacedList(
                   itemCount: state.alerts.length,
                   itemBuilder: (context, index) {
                     final alert = state.alerts[index];
@@ -49,21 +48,30 @@ class AlertsPage extends StatelessWidget {
                     return Card(
                       color: critical ? Colors.red.withValues(alpha: 0.08) : null,
                       child: ListTile(
-                        leading: Icon(
-                          critical ? Icons.sos : Icons.notifications_outlined,
-                          color: critical ? Colors.red : null,
+                        leading: Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Icon(
+                            critical ? Icons.sos : Icons.notifications_outlined,
+                            color: critical ? Colors.red : null,
+                          ),
                         ),
                         title: Text(alert.message),
-                        subtitle: Text(
-                          '${alert.type} · ${alert.severity} · '
-                          '${DateFormat.MMMd().add_Hm().format(alert.createdAt.toLocal())}',
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            '${alert.type} · ${alert.severity} · '
+                            '${DateFormat.MMMd().add_Hm().format(alert.createdAt.toLocal())}',
+                          ),
                         ),
                         trailing: state.canAcknowledge
-                            ? TextButton(
-                                onPressed: () => context
-                                    .read<AlertsBloc>()
-                                    .add(AlertAcknowledgeRequested(alert.id)),
-                                child: const Text('Ack'),
+                            ? Padding(
+                                padding: const EdgeInsets.only(left: 8),
+                                child: FilledButton.tonal(
+                                  onPressed: () => context
+                                      .read<AlertsBloc>()
+                                      .add(AlertAcknowledgeRequested(alert.id)),
+                                  child: Text(s.acknowledge),
+                                ),
                               )
                             : null,
                         onTap: alert.tripId == null

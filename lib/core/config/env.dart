@@ -1,5 +1,5 @@
-/// Runtime configuration. Override with:
-/// `flutter run -d chrome --dart-define=API_URL=https://sandbox.badrgo.com`
+
+
 class Env {
   Env._();
 

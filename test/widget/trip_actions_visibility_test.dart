@@ -6,7 +6,6 @@ import 'package:badr_test/features/trips/domain/entities/trip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Lightweight stand-in that mirrors permission-gated action buttons on trip detail.
 class _TripActionsBar extends StatelessWidget {
   const _TripActionsBar({
     required this.permissions,
@@ -76,7 +75,7 @@ void main() {
       'trip': ['read', 'assign', 'cancel'],
     });
 
-    // Viewer
+
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light,
@@ -92,7 +91,7 @@ void main() {
     expect(find.text('Cancel'), findsNothing);
     expect(find.text('Refund'), findsNothing);
 
-    // Dispatcher
+
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light,

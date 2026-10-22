@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/l10n/app_strings.dart';
 import '../../../../core/widgets/async_body.dart';
+import '../../../../core/widgets/page_chrome.dart';
 import '../../../../generated/openapi_models.dart';
 import '../bloc/drivers_bloc.dart';
 
@@ -22,21 +23,19 @@ class DriversPage extends StatelessWidget {
       },
       builder: (context, state) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Row(
-                children: [
-                  Text(s.navDrivers, style: Theme.of(context).textTheme.headlineSmall),
-                  const Spacer(),
-                  if (state.canCreate)
-                    FilledButton.icon(
-                      onPressed: () => _create(context, state),
-                      icon: const Icon(Icons.add),
-                      label: Text(s.create),
-                    ),
-                ],
-              ),
+            PageHeader(
+              title: s.navDrivers,
+              subtitle: 'Fleet directory for your city',
+              actions: [
+                if (state.canCreate)
+                  FilledButton.icon(
+                    onPressed: () => _create(context, state),
+                    icon: const Icon(Icons.add),
+                    label: Text(s.create),
+                  ),
+              ],
             ),
             Expanded(
               child: AsyncBody(
@@ -46,17 +45,19 @@ class DriversPage extends StatelessWidget {
                 onRetry: () => context
                     .read<DriversBloc>()
                     .add(const DriversRefreshRequested()),
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: SpacedList(
                   itemCount: state.drivers.length,
                   itemBuilder: (context, i) {
                     final d = state.drivers[i];
                     return Card(
                       child: ListTile(
                         title: Text(d.name),
-                        subtitle: Text(
-                          '${d.phone} · ${d.status} · ${d.cityName ?? d.cityId}'
-                          '${d.vehicle != null ? ' · ${d.vehicle!.plate}' : ''}',
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(
+                            '${d.phone} · ${d.status} · ${d.cityName ?? d.cityId}'
+                            '${d.vehicle != null ? ' · ${d.vehicle!.plate}' : ''}',
+                          ),
                         ),
                         trailing: state.canUpdate
                             ? IconButton(
